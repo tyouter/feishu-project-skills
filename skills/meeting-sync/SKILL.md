@@ -1,6 +1,6 @@
 ---
 name: meeting-sync
-description: Auto-sync Feishu meeting minutes (妙记) → structured minutes → Kanban/Bitable tasks → wiki push → group notification. Trigger: /meeting-sync
+description: 'Auto-sync Feishu meeting minutes (妙记) → structured minutes → Kanban/Bitable tasks → wiki push → group notification. Trigger: /meeting-sync'
 trigger: /meeting-sync
 ---
 

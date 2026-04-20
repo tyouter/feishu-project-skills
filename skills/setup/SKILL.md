@@ -1,6 +1,6 @@
 ---
 name: setup
-description: Guided one-prompt setup wizard for new project vaults. Creates skeleton, distributes skills, scaffolds config, runs health checks. Trigger: /setup
+description: 'Guided one-prompt setup wizard for new project vaults. Creates skeleton, distributes skills, scaffolds config, runs health checks. Trigger: /setup'
 trigger: /setup
 ---
 
