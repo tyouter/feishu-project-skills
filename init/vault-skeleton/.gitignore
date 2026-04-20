@@ -1,0 +1,42 @@
+# 业务数据目录（不纳入 git）
+0-Projects/
+1-Goals/
+2-Reports/
+3-Meetings/
+4-Risks/
+5-Team/
+6-Templates/
+7-Archive/
+8-Retrospective/
+Meetings/
+
+# 敏感配置
+.env
+*.secret
+
+# .claude 配置
+.claude/sync-state.yaml
+.claude/team-registry.json
+.claude/sync-log.md
+.claude/minutes-registry.json
+.claude/managed-projects.yaml
+.claude/velocity-data.json
+.claude/settings.local.json
+.claude/conflicts/
+.claude/memory/
+
+# Obsidian
+.obsidian/
+
+# Root-level generated files
+Dashboard.md
+Group-BIT_AI.md
+_Managed_Projects_Status.md
+_OKR_Overview.md
+_Risk_Register.md
+_Team_Overview.md
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
