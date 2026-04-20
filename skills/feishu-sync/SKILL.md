@@ -10,7 +10,7 @@ Bidirectional sync between Obsidian Vault and Feishu (Lark) Wiki with automatic 
 
 ## Feishu Target
 
-Read Wiki config from `.env` (tokens) and `.claude/sync-state.yaml` (mappings), with optional override from `.claude/feishu-local.yaml`:
+Read Wiki config from `.env` (tokens), `.claude/sync-state.yaml` (mappings), and `.claude/team-registry.json` (team), with optional override from `.claude/feishu-local.yaml`:
 - `feishu.wiki_token` → Wiki node token
 - `feishu.wiki_name` → Wiki display name
 - `feishu.space_id` → Wiki space ID
@@ -263,15 +263,21 @@ The vault has Obsidian Git configured (10-minute auto-backup):
 - Wiki token: read from `.env` (override via `.claude/feishu-local.yaml`)
 
 ### Config Loading Cascade
-Read config before any Feishu operation:
-1. Check `.env` for tokens
-2. Check `.claude/feishu-local.yaml` — if a field is non-empty, use it (personal override)
-3. Otherwise read from `.claude/sync-state.yaml` (shared default)
+
+Read config in priority order before any Feishu operation:
+
+1. **`.env`** — environment variables for Feishu/Bitable tokens
+2. **`.claude/team-registry.json`** — team member open_ids + group chat IDs
+3. **`.claude/sync-state.yaml`** — folder_mappings, file_mappings, stats
+4. **`.claude/feishu-local.yaml`** — personal override (optional, may not exist)
+
+Agent must check `.env` first for tokens, then fall back to `sync-state.yaml` for mapping data.
 
 ## Kanban ↔ Feishu Bitable Sync
 
 ### Bitable Configuration
-Read Bitable config from `.env` (tokens) and `.claude/sync-state.yaml` (mappings), with optional override from `.claude/feishu-local.yaml`:
+
+Read Bitable config from `.env` (tokens), `.claude/sync-state.yaml` (mappings), with optional override from `.claude/feishu-local.yaml`:
 - `bitable.base_token` → Bitable base token
 - `bitable.base_url` → Bitable URL
 - `bitable.project_table` → Project table name

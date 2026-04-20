@@ -92,7 +92,7 @@ For @mentions in group notifications, use `<at user_id="open_id">name</at>` form
    - Verify `.env` exists with required variables
    - Verify `.claude/team-registry.json` exists
    - Verify `.claude/sync-state.yaml` exists
-   - If any missing: prompt user to create from template (see `templates/` in feishu-project-skills repo)
+   - If any missing: suggest running `/setup` to complete initial configuration
 
 5. **Initialize registry** if not exists:
    - Read `.claude/minutes-registry.json`

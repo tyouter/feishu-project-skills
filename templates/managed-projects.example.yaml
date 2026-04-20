@@ -1,0 +1,37 @@
+# Managed Projects Registry
+# Add/remove projects to track via /project-manager track|untrack commands
+#
+# Git Safety: Agent ONLY reads git status/branches/commits
+# NEVER modifies managed projects (no commit/push/reset/checkout)
+
+managed_projects:
+  # Example managed project (can be removed or modified)
+  - id: example-project
+    path: /path/to/project
+    name: Example Project
+    owner: OwnerName
+    priority: P0
+    tracked_branches: [main, develop]
+    track_commits: true
+    track_status: true
+
+# Registry Management Commands:
+# /project-manager track <path>   - Add project
+# /project-manager untrack <id>   - Remove project
+# /project-manager list           - Show all managed
+# /project-manager scan           - Read-only git scan
+
+# Git Read-Only Commands Allowed:
+# - git status
+# - git branch -a
+# - git log --oneline -n 20
+# - git log <branch> --oneline
+# - git diff --stat
+# - git remote -v
+
+# Git Commands FORBIDDEN on Managed Projects:
+# - git commit
+# - git push
+# - git reset
+# - git checkout
+# - Any destructive operation

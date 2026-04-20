@@ -2,79 +2,58 @@
 
 飞书项目管理 SKILL 集合 — 与业务数据解耦，token 安全存储。
 
-## 安装
+## Quick Start
 
-将 `skills/` 目录复制到目标项目的 `.claude/skills/` 或全局 `~/.claude/skills/`：
+1. Clone this repo
+2. In your Claude session: `/setup`
+3. Follow the guided prompts
 
-```bash
-# 项目级别
-cp -r skills/* /path/to/project/.claude/skills/
+That's it. All skills are installed and configured.
 
-# 或全局级别
-cp -r skills/* ~/.claude/skills/
-```
+## Available Skills
 
-## 依赖
+| Skill | Trigger | Function |
+|-------|---------|----------|
+| `setup` | `/setup` | One-prompt guided setup wizard |
+| `meeting-sync` | `/meeting-sync` | 妙记 → structured minutes → Kanban/Bitable → group notify |
+| `feishu-sync` | `/sync-push`, `/sync-pull`, `/sync-full` | Vault ↔ Feishu bidirectional sync |
+| `project-manager` | `/project-manager` | Dashboard, OKR, reports, risks, daily tasks |
+| `lark-shared` | auto-loaded | lark-cli health check, auth, permissions |
 
-- **lark-cli** — 飞书 CLI（`npm install -g @larksuite/cli`）
-- **.env** — 飞书/Bitable token 配置（见 `templates/.env.example`）
-- **sync-state.yaml** — 同步状态映射（见 `templates/sync-state.example.yaml`）
-- **team-registry.json** — 团队成员 open_ids（见 `templates/team-registry.example.json`）
+## Prerequisites
 
-## 可用 SKILL
+- **lark-cli** — Feishu CLI (`npm install -g @larksuite/cli`)
+- Git
 
-| Skill | 触发方式 | 功能 |
-|-------|---------|------|
-| `meeting-sync` | `/meeting-sync` | 妙记自动同步 → 结构化纪要 → Kanban/Bitable 任务 → 群通知 |
-| `feishu-sync` | `/sync-push`, `/sync-pull`, `/sync-full` | Vault ↔ 飞书双向同步 |
-| `project-manager` | `/project-manager` | 项目看板、OKR、报告、风险、每日任务 |
-| `lark-shared` | 自动加载 | 飞书 CLI 健康检查、认证、权限管理 |
-
-## 新项目初始化
-
-1. 复制 `init/vault-skeleton/` 到项目根目录
-2. 复制 `templates/.env.example` → `.env`，填写实际值
-3. 复制 `templates/team-registry.example.json` → `.claude/team-registry.json`
-4. 复制 `templates/sync-state.example.yaml` → `.claude/sync-state.yaml`
-5. 安装 SKILL（见上方安装说明）
-6. 运行 `/meeting-sync` 或 `/project-manager` 开始使用
-
-详见 `init/guide.md`
-
-## 目录结构
+## Directory Structure
 
 ```
 feishu-project-skills/
 ├── README.md
-├── skills/                     # 纯净 SKILL 代码（无硬编码 token）
+├── skills/                     # Pure SKILL code (no hardcoded tokens)
+│   ├── setup/SKILL.md          # Guided setup wizard
 │   ├── meeting-sync/SKILL.md
 │   ├── feishu-sync/SKILL.md
 │   ├── project-manager/SKILL.md
 │   └── lark-shared/SKILL.md
-├── templates/                  # 配置模板（空值占位）
+├── templates/                  # Config templates (empty values)
 │   ├── .env.example
 │   ├── team-registry.example.json
-│   └── sync-state.example.yaml
+│   ├── sync-state.example.yaml
+│   ├── feishu-local.example.yaml
+│   └── managed-projects.example.yaml
 ├── init/
-│   └── guide.md               # 新项目初始化指南
-└── vault-skeleton/             # Obsidian 仓库骨架
-    ├── 0-Projects/Daily/
-    ├── 1-Goals/
-    ├── 2-Reports/Weekly/
-    ├── 3-Meetings/
-    ├── 4-Risks/
-    ├── 5-Team/
-    ├── 6-Templates/
-    ├── 7-Archive/
-    ├── 8-Retrospective/
-    │   ├── Agent_Evolution/
-    │   ├── Decisions/
-    │   └── Lessons_Learned/
-    └── Meetings/Video/
+│   ├── guide.md               # Manual setup guide (advanced)
+│   └── vault-skeleton/        # Obsidian vault directory skeleton
+└── .gitignore
 ```
 
-## 安全
+## Security
 
-- **所有 token 存储在 `.env`**，不进入 git
-- **SKILL 代码无硬编码密钥**，通过 `.env` + 配置文件引用
-- **`.env` 已在 .gitignore 中排除**
+- **All tokens in `.env`**, never committed to git
+- **SKILL code has no hardcoded secrets**
+- **`.env` excluded in .gitignore**
+
+## Manual Setup
+
+If you prefer manual setup, see `init/guide.md`.

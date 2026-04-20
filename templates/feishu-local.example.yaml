@@ -1,0 +1,11 @@
+# feishu-local.yaml — Machine-specific overrides (NOT committed to git)
+# Delete this file or leave it empty to use shared defaults from sync-state.yaml
+feishu:
+  wiki_token: ""          # Override: your wiki node token
+  wiki_name: ""           # Override: your wiki display name
+  space_id: ""            # Override: your wiki space ID
+bitable:
+  base_token: ""          # Override: your bitable base token
+  base_url: ""            # Override: your bitable URL
+  project_table: ""       # Override: your project table name
+  task_table: ""          # Override: your task table name

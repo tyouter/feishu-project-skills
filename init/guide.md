@@ -1,14 +1,16 @@
-# 新项目初始化指南
+# Manual Setup Guide (Advanced)
 
-## 前置条件
+> **Note:** Most users should use `/setup` instead. This guide is for manual setup, debugging, or custom configurations.
+
+## Prerequisites
 
 - [lark-cli](https://github.com/larksuite/lark-cli) — `npm install -g @larksuite/cli`
-- Obsidian（可选，用于可视化编辑 Vault）
+- Obsidian (optional, for visual vault editing)
 - Git
 
-## 步骤
+## Steps
 
-### 1. 创建项目目录
+### 1. Create Project Directory
 
 ```bash
 mkdir my-project-vault
@@ -16,122 +18,124 @@ cd my-project-vault
 git init
 ```
 
-### 2. 复制 Vault 骨架
+### 2. Copy Vault Skeleton
 
-从本项目的 `init/vault-skeleton/` 复制所有目录到项目根目录：
+Copy all directories from `init/vault-skeleton/` to the project root:
 
 ```bash
 cp -r init/vault-skeleton/* /path/to/my-project-vault/
 ```
 
-或使用 `/project-manager init` 自动生成。
-
-生成的目录结构：
+Generated structure:
 
 ```
 my-project-vault/
-├── 0-Projects/Daily/        # 项目看板、每日任务
-├── 1-Goals/                 # OKR 目标
-├── 2-Reports/Weekly/        # 周报/月报
-├── 3-Meetings/              # 会议记录
-├── 4-Risks/                 # 风险记录
-├── 5-Team/                  # 团队成员
-├── 6-Templates/             # 模板
-├── 7-Archive/               # 归档
-├── 8-Retrospective/         # 复盘记录
-├── Meetings/Video/          # 妙记产物
-└── .claude/skills/          # SKILL 占位
+├── 0-Projects/Daily/        # Project kanban, daily tasks
+├── 1-Goals/                 # OKR goals
+├── 2-Reports/Weekly/        # Weekly/monthly reports
+├── 2-Reports/Monthly/
+├── 3-Meetings/              # Meeting notes
+├── 4-Risks/                 # Risk records
+├── 5-Team/                  # Team member profiles
+├── 6-Templates/             # Templates
+├── 7-Archive/               # Archive
+├── 8-Retrospective/         # Retrospective records
+│   ├── Agent_Evolution/
+│   ├── Decisions/
+│   └── Lessons_Learned/
+├── Meetings/Video/          # Meeting video minutes
+└── .claude/skills/          # SKILL placeholder
 ```
 
-### 3. 配置飞书 token
+### 3. Configure Feishu Tokens
 
 ```bash
 cp templates/.env.example /path/to/my-project-vault/.env
-# 编辑 .env，填入实际值
+# Edit .env with actual values
 ```
 
-必填项：
-| 变量 | 来源 |
-|------|------|
+Required tokens:
+| Variable | Source |
+|----------|--------|
 | `FEISHU_SPACE_ID` | 飞书知识库 → 空间设置 |
-| `FEISHU_WIKI_TOKEN` | 飞书知识库 → 根节点 URL |
-| `BITABLE_BASE_TOKEN` | 飞书多维表格 URL |
-| `BITABLE_BASE_URL` | 飞书多维表格完整 URL |
-| `BITABLE_PROJECT_TABLE_ID` | 项目表 ID |
-| `BITABLE_TASK_TABLE_ID` | 任务表 ID |
-| `BITABLE_DAILY_TABLE_ID` | Daily 表 ID |
-| `BITABLE_DASHBOARD_ID` | 仪表盘 ID |
-| `FEISHU_GROUP_CHAT_ID` | 群聊 URL 中的 `oc_xxx` |
+| `FEISHU_WIKI_TOKEN` | 飞书知识库 → 根节点 URL last segment |
+| `BITABLE_BASE_TOKEN` | 飞书多维表格 URL after /base/ |
+| `BITABLE_BASE_URL` | 飞书多维表格 full domain |
+| `BITABLE_PROJECT_TABLE_ID` | 多维表格项目表 ID |
+| `BITABLE_TASK_TABLE_ID` | 多维表格任务表 ID |
+| `BITABLE_DAILY_TABLE_ID` | 多维表格每日任务表 ID |
+| `BITABLE_DASHBOARD_ID` | 多维表格仪表盘 ID |
+| `FEISHU_GROUP_CHAT_ID` | 飞书群聊 URL `oc_xxx` part |
 
-### 4. 配置团队成员
+### 4. Configure Team Members
 
 ```bash
 cp templates/team-registry.example.json /path/to/my-project-vault/.claude/team-registry.json
-# 编辑，填入成员 open_id 和群聊 ID
+# Edit with actual member open_ids and group chat ID
 ```
 
-获取 `open_id`：使用 `lark-cli` 通讯录查询，或从飞书管理后台获取。
+Get `open_id`: use `lark-cli contact user +search --query "<name>"` or from Feishu admin console.
 
-### 5. 安装 SKILL
+### 5. Install Skills
 
 ```bash
-# 项目级别（仅当前项目）
+# Project-level (this project only)
 cp -r skills/* /path/to/my-project-vault/.claude/skills/
 
-# 或全局级别（所有项目）
+# Or global-level (all projects)
 cp -r skills/* ~/.claude/skills/
 ```
 
-### 6. 初始化同步状态
+### 6. Initialize Sync State
 
-首次运行 `/sync-init` 或 `/sync-full` 会自动创建 `.claude/sync-state.yaml`。
+`/sync-init` or `/sync-full` auto-creates `.claude/sync-state.yaml`.
 
-也可手动复制模板：
+Or copy template manually:
 
 ```bash
 cp templates/sync-state.example.yaml /path/to/my-project-vault/.claude/sync-state.yaml
 ```
 
-### 7. 验证
+### 7. Verify
 
 ```bash
 cd /path/to/my-project-vault
 
-# 检查 lark-cli 认证
+# Check lark-cli auth
 lark-cli auth list
 
-# 检查配置
+# Check config
 cat .env
 cat .claude/team-registry.json
 
-# 运行 SKILL
-/project-manager        # 查看项目看板
-/meeting-sync           # 同步妙记
-/sync-status            # 查看同步状态
+# Run skills
+/project-manager        # View project dashboard
+/meeting-sync           # Sync meeting minutes
+/sync-status            # View sync status
 ```
 
-## 常见问题
+## Common Issues
 
-### 找不到 `.env` 文件
+### Missing `.env` file
 
-确保 `.env` 在 Vault 根目录（与 `0-Projects/` 同级），而非 `.claude/` 下。
+Ensure `.env` is at vault root (same level as `0-Projects/`), NOT inside `.claude/`.
 
-### `lark-cli auth list` 显示未登录
+### `lark-cli auth list` shows not logged in
 
 ```bash
 lark-cli auth login
 ```
 
-### 业务数据目录不进入 git
+### Business data not in git
 
-骨架中已包含 `.gitignore`，排除所有 `0-Projects/` ~ `8-Retrospective/`、`Meetings/` 和 `.claude/` 配置文件。只有 SKILL 代码和模板进入版本控制。
+The vault skeleton `.gitignore` excludes `0-Projects/` through `8-Retrospective/`, `Meetings/`, and `.claude/` config files. Only SKILL code and templates are tracked in git.
 
-### 多个项目共享同一套 SKILL
+### Multiple projects share same skills
 
-推荐全局安装：
+Install globally:
 
 ```bash
 cp -r skills/* ~/.claude/skills/
 ```
 
-每个项目只需维护自己的 `.env` + `team-registry.json` + `sync-state.yaml`。
+Each project only needs its own `.env` + `team-registry.json` + `sync-state.yaml`.

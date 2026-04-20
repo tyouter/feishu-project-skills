@@ -39,6 +39,8 @@ Read config in priority order:
 
 Agent must check `.env` first for tokens, then fall back to `sync-state.yaml` for mapping data.
 
+**If any config file is missing**: suggest running `/setup` to complete initial configuration.
+
 ## Usage
 
 ```
@@ -176,9 +178,8 @@ bitable_task_table: "✅ 任务"
 4. If status → 已完成，run deliverable verification
 
 ### Feishu Bitable Integration
-Read Bitable config from `.env` (tokens) and `.claude/sync-state.yaml` (mappings), with optional override from `.claude/feishu-local.yaml`:
-1. First check `feishu-local.yaml` — if a field is non-empty, use it
-2. Otherwise read from `sync-state.yaml` → `bitable.*`
+
+Read Bitable config from `.env` (tokens) and `.claude/sync-state.yaml` (mappings), with optional override from `.claude/feishu-local.yaml`.
 
 ## Git Safety Rules
 
@@ -205,10 +206,10 @@ The agent **NEVER** modifies managed projects. Only these read commands are allo
 ### Git Sync (Vault Only)
 The agent **CAN** commit/push the management vault itself:
 ```bash
-cd "C:\projects\project-management-vault"
+cd "$(git rev-parse --show-toplevel)"
 git status
 git add -A
-git commit -m "Weekly update: {summary}"
+git commit -m "Vault sync: $(date '+%Y-%m-%d') - Weekly update"
 git push origin main
 ```
 
