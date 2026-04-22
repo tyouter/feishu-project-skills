@@ -8,7 +8,6 @@
 6-Templates/
 7-Archive/
 8-Retrospective/
-Meetings/
 
 # 敏感配置
 .env
@@ -16,6 +15,7 @@ Meetings/
 
 # .claude 配置
 .claude/sync-state.yaml
+.claude/sync-mapping.yaml
 .claude/team-registry.json
 .claude/sync-log.md
 .claude/minutes-registry.json
@@ -24,6 +24,8 @@ Meetings/
 .claude/settings.local.json
 .claude/conflicts/
 .claude/memory/
+.claude/skills-source.json
+.claude/backups/
 
 # Obsidian
 .obsidian/

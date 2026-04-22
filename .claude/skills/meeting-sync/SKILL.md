@@ -26,10 +26,10 @@ This SKILL inherits and MUST follow these hard rules from existing skills:
 | Path | Purpose |
 |------|---------|
 | `.claude/minutes-registry.json` | Dedup registry: processed `minute_token` + metadata |
-| `Meetings/Video/` | Video meeting directory |
-| `Meetings/Video/<YYYY-MM-DD>_<title-slug>/` | Per-meeting subdirectory |
-| `Meetings/Video/<YYYY-MM-DD>_<title-slug>/transcript.md` | Structured transcript |
-| `Meetings/Video/<YYYY-MM-DD>_<title-slug>/minutes.md` | Meeting minutes (decisions + actions) |
+| `3-Meetings/<slug>/` | Per-meeting subdirectory |
+| `3-Meetings/<slug>/summary.md` | Meeting summary (decisions + actions, wiki source) |
+| `3-Meetings/<slug>/video/transcript.md` | Structured transcript |
+| `3-Meetings/<slug>/video/minutes.md` | AI extracted structured minutes (optional, merged with summary) |
 
 ## Config Loading
 
@@ -43,9 +43,11 @@ Before any operation, load config in this priority:
 
 2. **`.claude/team-registry.json`** — Team member open_ids and group chat IDs
 
-3. **`.claude/sync-state.yaml`** — Sync state: `folder_mappings`, `file_mappings`, `stats`
+3. **`.claude/sync-mapping.yaml`** — Static mapping: `folder_mappings`, `file_mappings`, bitable config
 
-4. **`.claude/feishu-local.yaml`** — Personal overrides (optional, may not exist)
+4. **`.claude/sync-state.yaml`** — Runtime state: sync timestamps, stats
+
+5. **`.claude/feishu-local.yaml`** — Personal overrides (optional, may not exist)
 
 ## Team Members
 
@@ -126,11 +128,11 @@ For each new `minute_token`:
 
 3. **Create meeting directory**:
    ```
-   Meetings/Video/<YYYY-MM-DD>_<title-slug>/
+   3-Meetings/<slug>/
    ```
-   - `<title-slug>`: simplified title (remove spaces, special chars, max 50 chars)
+   - `<slug>`: simplified date-based slug (e.g. `2026-04-16-mvp-planning`)
 
-4. **Write `transcript.md`** with frontmatter:
+4. **Write `video/transcript.md`** with frontmatter:
    ```markdown
    ---
    type: meeting-transcript
@@ -235,21 +237,21 @@ From the generated minutes, extract:
 
 4. **Git commit** local changes:
    ```bash
-   git add Meetings/ .claude/minutes-registry.json 0-Projects/Kanban.md 0-Projects/Daily/task-breakdown.json
+   git add 3-Meetings/ .claude/minutes-registry.json 0-Projects/Kanban.md 0-Projects/Daily/task-breakdown.json
    git commit -m "meeting-sync: <meeting-title> (<YYYY-MM-DD>)"
    ```
 
 5. **Push minutes to Feishu wiki**:
-   - Strip YAML frontmatter from `minutes.md`:
+   - Strip YAML frontmatter from `summary.md`:
      ```python
      import re
      stripped = re.sub(r'^---\n.*?\n---\n', '', content, flags=re.DOTALL, count=1)
      ```
-   - Determine parent folder from `sync-state.yaml` → `folder_mappings` (use the `feishu_node` for `3-Meetings` or equivalent folder)
-   - Create document:
+   - Determine parent folder from `sync-mapping.yaml` → `folder_mappings` (use the `feishu_node` for `3-Meetings` or equivalent folder)
+   - Extract `<doc_title>` from the first H1 heading in the stripped content
+   - Create document (ONE step):
      ```bash
-     lark-cli docs +create --markdown "$(cat stripped-minutes.md)"
-     lark-cli wiki nodes +create --parent "<folder_feishu_node>" --obj_type docx --obj_token "<new_doc_token>"
+     lark-cli docs +create --title "<doc_title>" --markdown "$(cat stripped-summary.md)" --wiki-node "<folder_feishu_node>" --wiki-space "<space_id>"
      ```
 
 6. **Update registry**:
@@ -260,7 +262,7 @@ From the generated minutes, extract:
          "title": "<meeting title>",
          "date": "YYYY-MM-DD",
          "minutes_doc_url": "<feishu wiki url>",
-         "local_path": "Meetings/Video/<slug>/",
+         "local_path": "3-Meetings/<slug>/",
          "tasks_extracted": N,
          "processed_at": "ISO-8601 timestamp"
        }
@@ -351,8 +353,7 @@ minute_token: <token>
 |---------|---------|
 | `lark-cli minutes +search --query "..." --page-size 50` | Search minutes (paginate with `has_more`) |
 | `lark-cli vc +notes --minute-tokens <token>` | Get AI summary + transcript file |
-| `lark-cli docs +create --markdown "..."` | Create Feishu doc |
-| `lark-cli wiki nodes +create --parent "<node>" --obj_type docx --obj_token "<token>"` | Add doc to wiki folder |
+| `lark-cli docs +create --title "<t>" --markdown "..." --wiki-node "<n>" --wiki-space "<s>"` | Create doc directly in Wiki folder (ONE step) |
 | `lark-cli im +messages-send --chat-id "<chat_id>" --markdown "..."` | Send group message |
 | `lark-cli base +record-list --base-token <t> --table-id "<name>" --limit N` | List Bitable records |
 | `lark-cli base +record-create --base-token <t> --table-id "<name>" --record '{...}'` | Create Bitable record |
@@ -362,7 +363,7 @@ minute_token: <token>
 
 1. `/meeting-sync` → auto-discovers new minutes, generates minutes, sends group notification
 2. Second run → "无新会议" (dedup working)
-3. `Meetings/Video/` → subdirectory with `transcript.md` + `minutes.md`
+3. `3-Meetings/<slug>/` → subdirectory with `summary.md` + `video/`
 4. `.claude/minutes-registry.json` → processed tokens recorded
 5. Feishu wiki → new minutes document created
 6. BIT AI team group → Markdown summary with @mentions

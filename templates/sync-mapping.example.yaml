@@ -1,0 +1,96 @@
+# Vault <-> Feishu Sync Mapping Configuration
+# Static mapping: folder_mappings, file_mappings, bitable config, conflict strategy
+# Runtime state (timestamps, stats) is stored separately in sync-state.yaml
+
+## Feishu Configuration
+feishu:
+  # Wiki Space ID (from Feishu Wiki -> Space Settings)
+  space_id: ""
+  space_name: ""
+
+  # Wiki root node token (last segment of Wiki URL)
+  wiki_token: ""
+  wiki_name: ""
+
+## Feishu Bitable Configuration (for Kanban sync)
+bitable:
+  base_token: ""
+  base_url: ""
+  project_table: ""
+  project_table_id: ""
+  task_table: ""
+  task_table_id: ""
+  daily_table: ""
+  daily_table_id: ""
+  dashboard_id: ""
+  dashboard_name: ""
+
+## Sync Scope Configuration
+sync_scope:
+  directories:
+    - path: "0-Projects"
+      feishu_folder: "Projects"
+      enabled: true
+    - path: "0-Projects/Daily"
+      feishu_folder: "Projects/Daily"
+      enabled: true
+    - path: "1-Goals"
+      feishu_folder: "OKR Goals"
+      enabled: true
+    - path: "2-Reports"
+      feishu_folder: "Reports"
+      enabled: true
+    - path: "3-Meetings"
+      feishu_folder: "Meetings"
+      enabled: true
+    - path: "4-Risks"
+      feishu_folder: "Risks"
+      enabled: true
+    - path: "5-Team"
+      feishu_folder: "Team"
+      enabled: true
+    - path: "6-Templates"
+      feishu_folder: "Templates"
+      enabled: true
+    - path: "7-Archive"
+      feishu_folder: "Archive"
+      enabled: false
+
+## Conflict Handling Strategy
+conflict:
+  strategy: "cloud_overwrite"
+  git_stash: true
+  stash_message: "sync-conflict-backup-{timestamp}"
+  backup_dir: ".claude/conflicts"
+  log_file: ".claude/sync-log.md"
+
+## Folder Mapping Registry
+# Populated by /sync-init — maps local directories to Feishu Wiki nodes
+folder_mappings: []
+# Example entry (auto-populated by /sync-init):
+#  - local: "0-Projects"
+#    feishu_node: "<node_token>"
+#    feishu_doc: "<doc_token>"
+#    title: "0-Projects"
+#    has_child: true
+#    sync_status: "folder_synced"
+
+## File Mapping Registry
+# Populated by sync operations — maps individual files to Feishu docs
+file_mappings: []
+# Example entry:
+#  - local: "0-Projects/Kanban.md"
+#    feishu_node: "<node_token>"
+#    feishu_doc: "<doc_token>"
+#    feishu_url: "https://www.feishu.cn/wiki/<node_token>"
+#    parent_folder: "<folder_node_token>"
+#    last_sync: ""
+#    sync_status: "pending_push"
+#    local_modified: ""
+#    feishu_modified: ""
+
+## Feishu-only documents (no matching local file)
+feishu_only_docs: []
+
+## Root File Mapping
+root_mappings: []

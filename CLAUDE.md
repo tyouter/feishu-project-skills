@@ -7,6 +7,7 @@
 本仓库提供以下 skills（位于 `.claude/skills/`）：
 
 - **setup** (`/setup`) — 一键引导配置向导，创建 vault 骨架、分发 skills、配置 .env
+- **update** (`/update`) — 检查并执行技能增量更新（`--check`、`--changelog`、`--force`、`--rollback <version>`）
 - **project-manager** (`/project-manager`) — 项目全生命周期管理：仪表盘、OKR、看板、风险、每日任务、效能追踪
 - **meeting-sync** (`/meeting-sync`) — 飞书妙记自动发现 → 结构化纪要 → 任务同步 → 群通知
 - **feishu-sync** (`/sync-push`, `/sync-pull`, `/sync-full`, `/sync-file`, `/sync-status`, `/sync-init`) — Obsidian ↔ 飞书知识库双向同步
@@ -26,8 +27,10 @@
 |--------|------|------|
 | 1 | `.env` | 飞书/Bitable Token |
 | 2 | `.claude/team-registry.json` | 团队成员 open_ids + 群聊 |
-| 3 | `.claude/sync-state.yaml` | 同步映射、统计数据 |
-| 4 | `.claude/feishu-local.yaml` | 个人覆盖（可选） |
+| 3 | `.claude/sync-mapping.yaml` | 静态映射：folder/file mappings、Bitable 配置 |
+| 4 | `.claude/sync-state.yaml` | 运行时状态：同步时间戳、统计 |
+| 5 | `.claude/feishu-local.yaml` | 个人覆盖（可选） |
+| 6 | `.claude/skills-source.json` | 安装源、版本号、更新记录 |
 
 ## 快速开始
 

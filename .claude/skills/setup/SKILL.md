@@ -40,7 +40,6 @@ VAULT_ROOT/
 │   ├── Agent_Evolution/
 │   ├── Decisions/
 │   └── Lessons_Learned/
-├── Meetings/Video/
 └── .claude/skills/
 ```
 
@@ -59,7 +58,34 @@ stats:
   last_full_sync: ""
 ```
 
+Also create `.claude/sync-mapping.yaml` from this repo's `templates/sync-mapping.example.yaml` (all token values empty).
+
 Confirm to user: "Vault skeleton created at `<VAULT_ROOT>`"
+
+### Step 2b: Create skills-source.json
+
+Read the VERSION file from this repo to get the current version:
+
+```bash
+SOURCE_VERSION="$(cat "$(git rev-parse --show-toplevel)/VERSION" | tr -d '[:space:]')"
+```
+
+Create `VAULT_ROOT/.claude/skills-source.json`:
+
+```json
+{
+  "source_repo": "$(git rev-parse --show-toplevel | sed 's/\\\\/\\//g')",
+  "installed_version": "${SOURCE_VERSION}",
+  "install_level": "<local|global>",
+  "last_setup": "<current ISO timestamp>",
+  "last_update": "",
+  "installed_skills": ["meeting-sync", "feishu-sync", "project-manager", "lark-shared", "setup", "update"],
+  "installed_templates": [],
+  "backup_versions": []
+}
+```
+
+Set `install_level` based on user's choice in Step 4. Set `source_repo` to the absolute path of this repo (use forward slashes for consistency).
 
 ### Step 3: Create .gitignore
 
@@ -72,9 +98,14 @@ Create `.gitignore` at `VAULT_ROOT/.gitignore` from this content:
 
 # Token-bearing configs
 .claude/sync-state.yaml
+.claude/sync-mapping.yaml
 .claude/team-registry.json
 .claude/minutes-registry.json
 .claude/feishu-local.yaml
+
+# Version tracking & backups
+.claude/skills-source.json
+.claude/backups/
 
 # AI/IDE caches
 .obsidian/copilot-index-*.json
@@ -100,13 +131,14 @@ Ask the user:
 > - `local` — project-level (VAULT_ROOT/.claude/skills/) — recommended
 > - `global` — system-level (~/.claude/skills/) — for multi-project use
 
-Copy all 5 skills from this repo's `.claude/skills/` directory to the target:
+Copy all 6 skills from this repo's `.claude/skills/` directory to the target:
 
 - `meeting-sync/SKILL.md`
 - `feishu-sync/SKILL.md`
 - `project-manager/SKILL.md`
 - `lark-shared/SKILL.md`
 - `setup/SKILL.md`
+- `update/SKILL.md`
 
 Use the following commands:
 
@@ -122,7 +154,7 @@ cp -r "${SKILLS_SRC}"/* "${VAULT_ROOT}/.claude/skills/"
 cp -r "${SKILLS_SRC}"/* ~/.claude/skills/
 ```
 
-Confirm: "5 skills installed to `<target_path>`"
+Confirm: "6 skills installed to `<target_path>`"
 
 ### Step 5: Generate .env Scaffold
 
@@ -222,7 +254,7 @@ Output a summary:
 ## Setup Complete
 
 Vault: <VAULT_ROOT>
-Skills: installed to <local|global>
+Skills: 6 installed to <local|global>
 .env: <filled|partial> (<N>/<total> tokens)
 Team: <N> members configured
 lark-cli: <ready|needs attention>
@@ -231,6 +263,7 @@ Next steps:
 - Run `/project-manager` to view dashboard
 - Run `/meeting-sync` to discover meeting minutes
 - Run `/sync-status` to check Feishu sync state
+- Run `/update` to check for skill updates
 ```
 
 If any step was skipped or partially completed, clearly list what needs manual attention.

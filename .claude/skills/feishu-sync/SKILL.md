@@ -10,10 +10,11 @@ Bidirectional sync between Obsidian Vault and Feishu (Lark) Wiki with automatic 
 
 ## Feishu Target
 
-Read Wiki config from `.env` (tokens), `.claude/sync-state.yaml` (mappings), and `.claude/team-registry.json` (team), with optional override from `.claude/feishu-local.yaml`:
-- `feishu.wiki_token` → Wiki node token
-- `feishu.wiki_name` → Wiki display name
-- `feishu.space_id` → Wiki space ID
+Read Wiki config from `.env` (tokens), `.claude/sync-mapping.yaml` (static mapping), `.claude/sync-state.yaml` (runtime state), and `.claude/team-registry.json` (team), with optional override from `.claude/feishu-local.yaml`:
+- `feishu.wiki_token` → Wiki node token (from `sync-mapping.yaml` or `.env`)
+- `feishu.wiki_name` → Wiki display name (from `sync-mapping.yaml`)
+- `feishu.space_id` → Wiki space ID (from `sync-mapping.yaml` or `.env`)
+- `bitable.*` → Bitable table config (from `sync-mapping.yaml` or `.env`)
 
 ## Usage
 
@@ -68,13 +69,17 @@ Push local changes to Feishu Wiki **with conflict detection**:
      - Write stripped content to temp file in `.claude/` directory (relative path for lark-cli)
      - **Determine parent folder:** Check `sync-state.yaml` → `folder_mappings` to find the matching `feishu_node` for the file's directory. If no mapping found, use `feishu.wiki_token` from config as fallback.
      - Check if Feishu document exists in mapping
-     - If exists: `lark-cli docs +update --doc "<doc_token>" --mode overwrite --markdown @./.claude/<tempfile>`
-     - If new: Create doc under the correct wiki folder (NOT personal homepage):
+     - If exists: `lark-cli docs +update --doc "<doc_token>" --mode overwrite --markdown @./.claude/<tempfile> --new-title "<title>"`
+     - If new: Create doc directly in the correct wiki folder with title (ONE step, NOT two):
        ```bash
-       lark-cli docs +create --markdown @./.claude/<tempfile>
-       lark-cli wiki nodes +create --parent "<parent_feishu_node>" --obj_type docx --obj_token "<new_doc_token>"
+       lark-cli docs +create --title "<doc_title>" --markdown @./.claude/<tempfile> --wiki-node "<parent_feishu_node>" --wiki-space "<space_id>"
        ```
-       **CRITICAL:** `<parent_feishu_node>` must be the `feishu_node` from `folder_mappings` matching the file's directory (e.g., `2-Reports` → `LIHewe39Min58skUDZac8eMdn2g`), NOT the root `wiki_token`. This ensures documents land in the correct wiki folder, not the user's personal homepage.
+       **CRITICAL:**
+       - Use `docs +create --wiki-node` to create directly in the wiki folder in ONE step. This sets both title and content correctly.
+       - Do NOT use the old two-step flow (`docs +create` then `wiki nodes create`) — it creates a separate empty doc with no title.
+       - `<parent_feishu_node>` must be the `feishu_node` from `folder_mappings` matching the file's directory (e.g., `2-Reports` → `LIHewe39Min58skUDZac8eMdn2g`), NOT the root `wiki_token`.
+       - Extract `<doc_title>` from the first H1 heading (`# Title`) in the markdown content, or derive from the filename.
+       - `<space_id>` is read from `.env` (`FEISHU_SPACE_ID`) or `sync-mapping.yaml` → `feishu.space_id`.
      - Clean up temp file
 4. **Update sync-state.yaml** with new timestamps
 5. **Update stats** (successful_push count)
@@ -82,11 +87,10 @@ Push local changes to Feishu Wiki **with conflict detection**:
 **Lark CLI Commands:**
 ```bash
 # Update existing document
-lark-cli docs +update --doc "<doc_token>" --mode overwrite --markdown "$(cat file.md)"
+lark-cli docs +update --doc "<doc_token>" --mode overwrite --markdown "$(cat file.md)" --new-title "<title>"
 
-# Create new document and add to Wiki (use folder_mapping feishu_node as parent, NOT wiki_token)
-lark-cli docs +create --markdown "$(cat file.md)"
-lark-cli wiki nodes +create --parent "<folder_feishu_node>" --obj_type docx --obj_token "<new_doc_token>"
+# Create new document directly in Wiki folder (ONE step)
+lark-cli docs +create --title "<title>" --markdown "$(cat file.md)" --wiki-node "<parent_node>" --wiki-space "<space_id>"
 ```
 
 ### /sync-pull (Feishu → Local)
@@ -222,9 +226,9 @@ lark-cli wiki nodes list --params '{"token":"<wiki_token>"}'
 lark-cli wiki nodes +create --parent "<wiki_token>" --obj_type docx --obj_token "<doc_token>"
 
 # Document Operations
-lark-cli docs +create --markdown "$(cat file.md)"
+lark-cli docs +create --title "<title>" --markdown "$(cat file.md)" --wiki-node "<parent_node>" --wiki-space "<space_id>"
 lark-cli docs +fetch --doc "<doc_token>" --format json
-lark-cli docs +update --doc "<doc_token>" --mode overwrite --markdown "$(cat file.md)"
+lark-cli docs +update --doc "<doc_token>" --mode overwrite --markdown "$(cat file.md)" --new-title "<title>"
 
 # Drive Metadata
 lark-cli drive metas batch_query --params '{"tokens":["<doc_token>"]}'
@@ -237,7 +241,8 @@ lark-cli docs +media-download --doc "<doc_token>" --file_token "<file_token>"
 
 | File | Purpose |
 |------|---------|
-| `.claude/sync-state.yaml` | Mapping registry + config |
+| `.claude/sync-mapping.yaml` | Static mapping: folder_mappings, file_mappings, bitable config, conflict strategy |
+| `.claude/sync-state.yaml` | Runtime state: sync timestamps, stats |
 | `.claude/sync-log.md` | Sync operation log |
 | `.claude/conflicts/` | Conflict backup directory |
 
@@ -268,20 +273,24 @@ Read config in priority order before any Feishu operation:
 
 1. **`.env`** — environment variables for Feishu/Bitable tokens
 2. **`.claude/team-registry.json`** — team member open_ids + group chat IDs
-3. **`.claude/sync-state.yaml`** — folder_mappings, file_mappings, stats
-4. **`.claude/feishu-local.yaml`** — personal override (optional, may not exist)
+3. **`.claude/sync-mapping.yaml`** — static mapping: folder_mappings, file_mappings, feishu_only_docs, root_mappings, bitable config (primary source for mapping data)
+4. **`.claude/sync-state.yaml`** — runtime state: sync timestamps, stats (supplementary to sync-mapping)
+5. **`.claude/feishu-local.yaml`** — personal override (optional, may not exist)
 
-Agent must check `.env` first for tokens, then fall back to `sync-state.yaml` for mapping data.
+Agent must check `.env` first for tokens, then `sync-mapping.yaml` for static mapping data, then `sync-state.yaml` for runtime state.
 
 ## Kanban ↔ Feishu Bitable Sync
 
 ### Bitable Configuration
 
-Read Bitable config from `.env` (tokens), `.claude/sync-state.yaml` (mappings), with optional override from `.claude/feishu-local.yaml`:
+Read Bitable config from `.env` (tokens), `.claude/sync-mapping.yaml` (bitable section), with optional override from `.claude/feishu-local.yaml`:
 - `bitable.base_token` → Bitable base token
 - `bitable.base_url` → Bitable URL
 - `bitable.project_table` → Project table name
 - `bitable.task_table` → Task table name
+- `bitable.project_table_id` → Project table ID (from `sync-mapping.yaml`)
+- `bitable.task_table_id` → Task table ID (from `sync-mapping.yaml`)
+- `bitable.daily_table_id` → Daily task table ID (from `sync-mapping.yaml`)
 
 ### Sync Flow (Kanban → Bitable)
 
