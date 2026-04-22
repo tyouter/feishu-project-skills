@@ -1,7 +1,7 @@
 ---
 name: feishu-sync
 description: Vault ↔ Feishu bidirectional sync with conflict handling. Push local to cloud, pull cloud to local, full sync.
-trigger: /sync-push /sync-pull /sync-full /sync-file
+trigger: /sync-push /sync-pull /sync-full /sync-file /sync-status /sync-init
 ---
 
 # /feishu-sync

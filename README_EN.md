@@ -93,7 +93,7 @@ That's it. All skills are installed and configured.
 | `setup` | `/setup` | Guided one-prompt setup wizard |
 | `project-manager` | `/project-manager` | Full project lifecycle management |
 | `meeting-sync` | `/meeting-sync` | Minutes → structured → task sync |
-| `feishu-sync` | `/sync-push`, `/sync-pull`, `/sync-full` | Bidirectional vault sync |
+| `feishu-sync` | `/sync-push`, `/sync-pull`, `/sync-full`, `/sync-file`, `/sync-status`, `/sync-init` | Bidirectional vault sync |
 | `lark-shared` | auto-loaded | CLI health check, auth, permissions |
 
 ---
@@ -110,14 +110,17 @@ That's it. All skills are installed and configured.
 
 ```
 feishu-project-skills/
+├── CLAUDE.md                    # Claude Code project instructions
 ├── README.md                    # 中文版
 ├── README_EN.md                 # English version
-├── skills/                      # Pure SKILL code (no hardcoded tokens)
-│   ├── setup/SKILL.md           # Guided setup wizard
-│   ├── meeting-sync/SKILL.md    # Auto meeting minutes sync
-│   ├── feishu-sync/SKILL.md     # Bidirectional vault sync
-│   ├── project-manager/SKILL.md # Project management core
-│   └── lark-shared/SKILL.md     # lark-cli shared rules
+├── .claude/
+│   ├── skills/                  # Pure SKILL code (no hardcoded tokens)
+│   │   ├── setup/SKILL.md       # Guided setup wizard
+│   │   ├── meeting-sync/SKILL.md # Auto meeting minutes sync
+│   │   ├── feishu-sync/SKILL.md # Bidirectional vault sync
+│   │   ├── project-manager/SKILL.md # Project management core
+│   │   └── lark-shared/SKILL.md # lark-cli shared rules
+│   └── settings.local.json      # Claude Code local permissions
 ├── templates/                   # Config templates (empty values)
 │   ├── .env.example             # Feishu/Bitable tokens
 │   ├── team-registry.example.json  # Team member open_ids

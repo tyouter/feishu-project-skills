@@ -100,20 +100,33 @@ Ask the user:
 > - `local` — project-level (VAULT_ROOT/.claude/skills/) — recommended
 > - `global` — system-level (~/.claude/skills/) — for multi-project use
 
-Copy all 4 skills from this repo's `skills/` directory to the target:
+Copy all 5 skills from this repo's `.claude/skills/` directory to the target:
 
 - `meeting-sync/SKILL.md`
 - `feishu-sync/SKILL.md`
 - `project-manager/SKILL.md`
 - `lark-shared/SKILL.md`
+- `setup/SKILL.md`
 
-Also copy the setup skill itself to the target.
+Use the following commands:
 
-Confirm: "4 skills installed to `<target_path>`"
+```bash
+# Determine source: the .claude/skills/ directory in THIS repo
+SKILLS_SRC="$(git rev-parse --show-toplevel)/.claude/skills"
+
+# For local install:
+mkdir -p "${VAULT_ROOT}/.claude/skills"
+cp -r "${SKILLS_SRC}"/* "${VAULT_ROOT}/.claude/skills/"
+
+# For global install:
+cp -r "${SKILLS_SRC}"/* ~/.claude/skills/
+```
+
+Confirm: "5 skills installed to `<target_path>`"
 
 ### Step 5: Generate .env Scaffold
 
-Create `VAULT_ROOT/.env` from `templates/.env.example` (all values empty).
+Create `VAULT_ROOT/.env` from this repo's `templates/.env.example` (all values empty).
 
 Show the user the file and explain each token:
 

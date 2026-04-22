@@ -93,7 +93,7 @@ English version: [README_EN.md](./README_EN.md)
 | `setup` | `/setup` | 一键引导配置向导 |
 | `project-manager` | `/project-manager` | 项目全生命周期管理 |
 | `meeting-sync` | `/meeting-sync` | 妙记 → 结构化纪要 → 任务同步 |
-| `feishu-sync` | `/sync-push`, `/sync-pull`, `/sync-full` | 知识库双向同步 |
+| `feishu-sync` | `/sync-push`, `/sync-pull`, `/sync-full`, `/sync-file`, `/sync-status`, `/sync-init` | 知识库双向同步 |
 | `lark-shared` | 自动加载 | CLI 健康检查、认证、权限 |
 
 ---
@@ -110,14 +110,17 @@ English version: [README_EN.md](./README_EN.md)
 
 ```
 feishu-project-skills/
+├── CLAUDE.md                    # Claude Code 项目指令
 ├── README.md                    # 中文说明
 ├── README_EN.md                 # English version
-├── skills/                      # 纯净 SKILL 代码（无硬编码 token）
-│   ├── setup/SKILL.md           # 引导式配置向导
-│   ├── meeting-sync/SKILL.md    # 妙记自动同步
-│   ├── feishu-sync/SKILL.md     # 知识库双向同步
-│   ├── project-manager/SKILL.md # 项目管理核心
-│   └── lark-shared/SKILL.md     # lark-cli 共享规则
+├── .claude/
+│   ├── skills/                  # 纯净 SKILL 代码（无硬编码 token）
+│   │   ├── setup/SKILL.md       # 引导式配置向导
+│   │   ├── meeting-sync/SKILL.md # 妙记自动同步
+│   │   ├── feishu-sync/SKILL.md # 知识库双向同步
+│   │   ├── project-manager/SKILL.md # 项目管理核心
+│   │   └── lark-shared/SKILL.md # lark-cli 共享规则
+│   └── settings.local.json      # Claude Code 本地权限配置
 ├── templates/                   # 配置模板（空值占位）
 │   ├── .env.example             # 飞书/Bitable Token
 │   ├── team-registry.example.json  # 团队成员 open_id

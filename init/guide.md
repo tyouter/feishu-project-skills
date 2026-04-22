@@ -80,10 +80,10 @@ Get `open_id`: use `lark-cli contact user +search --query "<name>"` or from Feis
 
 ```bash
 # Project-level (this project only)
-cp -r skills/* /path/to/my-project-vault/.claude/skills/
+cp -r .claude/skills/* /path/to/my-project-vault/.claude/skills/
 
 # Or global-level (all projects)
-cp -r skills/* ~/.claude/skills/
+cp -r .claude/skills/* ~/.claude/skills/
 ```
 
 ### 6. Initialize Sync State
@@ -135,7 +135,7 @@ The vault skeleton `.gitignore` excludes `0-Projects/` through `8-Retrospective/
 Install globally:
 
 ```bash
-cp -r skills/* ~/.claude/skills/
+cp -r .claude/skills/* ~/.claude/skills/
 ```
 
 Each project only needs its own `.env` + `team-registry.json` + `sync-state.yaml`.
